@@ -1,7 +1,6 @@
 import fitz  # PyMuPDF
 import logging
 import os
-import asyncio
 import uuid  # Import this at the top of your script
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler
@@ -140,14 +139,14 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def delete_file_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.message.from_user.id  # Get user ID
+    query: CallbackQuery = update.callback_query
+    user_id = query.from_user.id  # ✅ Correct way to get user ID in callback queries
 
     if user_id != ADMIN_ID:
-        await update.message.reply_text("🚫 Access Denied! Only the admin can use this bot.")
-        return  # Stop execution
+        await query.answer("🚫 Access Denied! Only the admin can use this bot.", show_alert=True)
+        return  # Stop execution if user is not admin
 
-    query: CallbackQuery = update.callback_query
-    await query.answer()
+    await query.answer()  # ✅ Acknowledge the button press
 
     if query.data.startswith("delete:"):
         output_pdf_path = query.data.split("delete:")[1]
@@ -160,6 +159,7 @@ async def delete_file_callback(update: Update, context: ContextTypes.DEFAULT_TYP
             await query.edit_message_text(text="⚠️ File not found or already deleted.")
     elif query.data == "keep":
         await query.edit_message_text(text="✅ Output file kept.")
+
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Operation cancelled.")
