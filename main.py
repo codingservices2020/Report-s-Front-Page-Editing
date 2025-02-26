@@ -3,7 +3,7 @@ import logging
 import os
 import uuid  # Import this at the top of your script
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler, CallbackContext
 from keep_alive import keep_alive
 keep_alive()
 
@@ -82,6 +82,7 @@ async def receive_new_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    sent_message = await update.message.reply_text(f"Processing. Please wait...")
     user_id = update.message.from_user.id  # Get user ID
 
     if user_id != ADMIN_ID:
@@ -133,6 +134,8 @@ async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
             text=f"Do you want to delete the output file `{output_pdf_name}`?",
             reply_markup=reply_markup
         )
+        context.job_queue.run_once(delete_message, 1,
+                                   data=(sent_message.chat.id, sent_message.message_id))
 
     else:
         await update.message.reply_text("Please upload a valid PDF file.")
@@ -160,6 +163,11 @@ async def delete_file_callback(update: Update, context: ContextTypes.DEFAULT_TYP
     elif query.data == "keep":
         await query.edit_message_text(text="✅ Output file kept.")
 
+
+# ------------------ Delete Message Function ------------------ #
+async def delete_message(context: CallbackContext):
+    chat_id, message_id = context.job.data
+    await context.bot.delete_message(chat_id=chat_id, message_id=message_id)
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Operation cancelled.")
