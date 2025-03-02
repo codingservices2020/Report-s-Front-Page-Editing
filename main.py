@@ -36,7 +36,7 @@ def edit_pdf(input_pdf, output_pdf, output_pdf_name):
     doc = fitz.open(input_pdf)
     page = doc[0]        # Select the first page
 
-    hide_rect = fitz.Rect(36.0, 304.0, 300, 410)   # Define the rectangle where text should be hidden
+    hide_rect = fitz.Rect(30.0, 304.0, 600, 410)   # Define the rectangle where text should be hidden
     # Draw a white rectangle over the text area
     page.draw_rect(hide_rect, color=(1, 1, 1), fill=(1, 1, 1))  # White fill
 
