@@ -121,7 +121,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text("✅ Welcome, Admin! Send me a PDF to edit.")
 
-async def handle_document(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_document(update: Update, context: CallbackContext) -> None:
     # sent_message = await update.message.reply_text(f"Processing. Please wait...")
     user_id = update.message.from_user.id  # Get user ID
 
