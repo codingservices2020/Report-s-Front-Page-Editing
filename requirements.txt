@@ -1,6 +1,8 @@
 aiogram==2.23.1
 flask
-gunicorn==21.2.0
 python-dotenv~=1.0.1
 python-telegram-bot[job-queue]~=21.10
 pymupdf==1.23.6
+fitz~=0.0.1.dev2
+pyhanko
+PyPDF2~=3.0.1
